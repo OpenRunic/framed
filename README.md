@@ -1,6 +1,7 @@
+### Table by OpenRunic
 ![Test Status](https://github.com/OpenRunic/framed/actions/workflows/lint-test.yml/badge.svg)
 
-## Docs
+### Docs
 Data manipulation library inspired from Pandas (Python)
 
 #### Download
@@ -193,10 +194,10 @@ framed.ToType(10)
 value := framed.ColumnValue[string](row, 0, "default_value")
 ```
 
-## Support
+### Support
 
 You can file an [Issue](https://github.com/OpenRunic/framed/issues/new).
 
-## Contribute
+### Contribute
 
 To contrib to this project, you can open a PR or an issue.
