@@ -1,3 +1,5 @@
+![Test Status](https://github.com/OpenRunic/framed/actions/workflows/go.yml/badge.svg)
+
 ## Docs
 Data manipulation library inspired from Pandas (Python)
 
