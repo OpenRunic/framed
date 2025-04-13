@@ -2,7 +2,6 @@ package framed_test
 
 import (
 	"math/rand"
-	"testing"
 	"time"
 
 	"fmt"
@@ -15,7 +14,7 @@ const stringSet = "abcdefghijklmnopqrstuvwxyz" +
 
 var seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 
-func StringWithCharset(length int) string {
+func StringRandom(length int) string {
 	b := make([]byte, length)
 	for i := range b {
 		b[i] = stringSet[seededRand.Intn(len(stringSet))]
@@ -23,7 +22,7 @@ func StringWithCharset(length int) string {
 	return string(b)
 }
 
-func SampleTestTable(t testing.TB, sizes ...int) *framed.Table {
+func SampleTestTable(sizes ...int) *framed.Table {
 	size := 100
 	if len(sizes) > 0 {
 		size = sizes[0]
@@ -32,11 +31,11 @@ func SampleTestTable(t testing.TB, sizes ...int) *framed.Table {
 	rows := make([][]string, size)
 	for idx := range size {
 		rows[idx] = []string{
-			fmt.Sprint(idx + 1), StringWithCharset(10), StringWithCharset(10), fmt.Sprint(rand.Intn(50)),
+			fmt.Sprint(idx + 1), StringRandom(10), StringRandom(10), fmt.Sprint(rand.Intn(50)),
 		}
 	}
 
-	df, _ := framed.Series(rows,
+	df, _ := framed.Raw(rows,
 		framed.WithColumns(
 			"id", "first_name", "last_name", "age",
 		),

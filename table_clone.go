@@ -8,7 +8,7 @@ func (t *Table) Clone() *Table {
 }
 
 // clone table with state and options but resolved
-func (t *Table) CloneP() *Table {
+func (t *Table) CloneO() *Table {
 	return New().
 		SetState(t.State.Clone()).
 		SetOptions(t.Options.Clone())
@@ -26,20 +26,18 @@ func (t *Table) CloneE() *Table {
 
 // cherry pick the columns and build table
 func CherryPick(src *Table, columns []string, rows []*Row) (*Table, error) {
-	df := src.CloneP()
+	df := src.CloneO()
 
 	if !src.State.IsEmpty() {
 		df.UseColumns(SlicePick(src.State.Columns, columns))
 
-		idx := 0
 		for _, fRow := range rows {
-			nRow, err := fRow.Pick(src.State, columns...)
+			nRow, err := fRow.CloneP(src.State, columns...)
 			if err != nil {
 				return nil, err
 			}
 
-			df.AddRow(nRow.WithIndex(idx))
-			idx += 1
+			df.AddRow(nRow)
 		}
 	}
 

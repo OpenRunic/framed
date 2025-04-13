@@ -7,7 +7,7 @@ import (
 )
 
 func TestTableRenameColumn(t *testing.T) {
-	df := SampleTestTable(t)
+	df := SampleTestTable()
 	newDF, err := df.Execute(
 		framed.RenameColumn("age", "just_a_num"),
 	)

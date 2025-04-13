@@ -7,7 +7,7 @@ import (
 )
 
 func TestTableToWriter(t *testing.T) {
-	df := SampleTestTable(t)
+	df := SampleTestTable()
 
 	var b bytes.Buffer
 	bWriter := io.Writer(&b)

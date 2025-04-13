@@ -26,17 +26,15 @@ func (a ActionChangeColumnType[T]) Execute(src *Table) (*Table, error) {
 		df.SetDefinition(a.name, NewDefinition(a.dataType))
 	}
 
-	idx := 0
 	for _, r := range src.Rows {
-		row := r.Clone().WithIndex(idx)
+		row := r.Clone()
 		df.AddRow(row.Set(colIndex, a.callback(df.State, row, row.At(colIndex))))
-		idx += 1
 	}
 
 	return df, nil
 }
 
-func ChangeColumnType[T any](name string, sample T, cb ChangeColumnDataReader[T]) *ActionChangeColumnType[T] {
+func ChangeType[T any](name string, sample T, cb ChangeColumnDataReader[T]) *ActionChangeColumnType[T] {
 	return &ActionChangeColumnType[T]{
 		name:     name,
 		dataType: ToType(sample),

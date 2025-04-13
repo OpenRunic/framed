@@ -17,7 +17,7 @@ func File(path string, cbs ...OptionCallback) (*Table, error) {
 }
 
 // create table from external uri
-func Url(uri string, cbs ...OptionCallback) (*Table, error) {
+func URL(uri string, cbs ...OptionCallback) (*Table, error) {
 	response, err := http.Get(uri)
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func Lines(lines []string, cbs ...OptionCallback) (*Table, error) {
 }
 
 // create table from slice of raw data
-func Series(ss [][]string, cbs ...OptionCallback) (*Table, error) {
+func Raw(ss [][]string, cbs ...OptionCallback) (*Table, error) {
 	df := New(cbs...)
 
 	err := df.InsertSlices(ss)

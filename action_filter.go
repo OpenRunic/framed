@@ -14,10 +14,12 @@ func (a ActionFilter) Execute(src *Table) (*Table, error) {
 		return src.CloneE(), nil
 	}
 
+	idx := 0
 	var filtered = make([]*Row, 0)
 	for _, row := range src.Rows {
 		if a.callback(src.State, row) {
-			filtered = append(filtered, row)
+			filtered = append(filtered, row.Clone().WithIndex(idx))
+			idx++
 		}
 	}
 

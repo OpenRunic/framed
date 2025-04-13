@@ -6,7 +6,7 @@ import (
 )
 
 func TestTableResolveDefinition(t *testing.T) {
-	df := SampleTestTable(t)
+	df := SampleTestTable()
 	def := df.ResolveValueDefinition(20, "test", "2.501")
 
 	if def.Kind() != reflect.Float64 {

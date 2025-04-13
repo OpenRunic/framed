@@ -15,16 +15,12 @@ type Row struct {
 	Columns []any
 }
 
-func (r *Row) Length() int {
-	return len(r.Columns)
-}
-
 func (r *Row) WithIndex(idx int) *Row {
 	r.Index = idx
 	return r
 }
 
-func (r *Row) AddColumn(name string, value any) *Row {
+func (r *Row) AddColumn(value any) *Row {
 	r.Columns = append(r.Columns, value)
 	return r
 }
@@ -54,7 +50,7 @@ func (r *Row) Patch(def *ColumnDefinition, idx int, value any) error {
 
 // encode the slice of any as slice of strings
 func (r *Row) AsSlice(s *State) ([]string, error) {
-	colCount := r.Length()
+	colCount := len(r.Columns)
 	values := make([]string, colCount)
 
 	for i := range colCount {
@@ -69,7 +65,7 @@ func (r *Row) AsSlice(s *State) ([]string, error) {
 }
 
 // pick only provided columns from the row
-func (r *Row) Pick(s *State, names ...string) (*Row, error) {
+func (r *Row) Pick(s *State, names ...string) ([]any, error) {
 	cols := slices.Clone(names)
 	if len(cols) < 1 {
 		cols = slices.Clone(s.Columns)
@@ -86,7 +82,18 @@ func (r *Row) Pick(s *State, names ...string) (*Row, error) {
 		}
 	}
 
+	return columns, nil
+}
+
+// clone the row with only selected columns
+func (r *Row) CloneP(s *State, names ...string) (*Row, error) {
+	columns, err := r.Pick(s, names...)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Row{
+		Index:   r.Index,
 		Columns: columns,
 	}, nil
 }
@@ -94,6 +101,7 @@ func (r *Row) Pick(s *State, names ...string) (*Row, error) {
 // clone the row as-is
 func (r *Row) Clone() *Row {
 	return &Row{
+		Index:   r.Index,
 		Columns: slices.Clone(r.Columns),
 	}
 }

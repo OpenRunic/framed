@@ -9,7 +9,7 @@ import (
 
 func TestTablePickColumns(t *testing.T) {
 	cols := []string{"first_name", "age"}
-	df := SampleTestTable(t)
+	df := SampleTestTable()
 	newDF, err := df.Execute(
 		framed.PickColumn(cols...),
 	)
@@ -24,7 +24,7 @@ func TestTablePickColumns(t *testing.T) {
 }
 
 func TestTableDropColumns(t *testing.T) {
-	df := SampleTestTable(t)
+	df := SampleTestTable()
 	newDF, err := df.Execute(
 		framed.DropColumn("id", "last_name"),
 	)

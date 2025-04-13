@@ -14,11 +14,9 @@ func (a ActionModifyRow) ExecName() string {
 func (a ActionModifyRow) Execute(src *Table) (*Table, error) {
 	df := src.CloneE()
 
-	idx := 0
 	for _, r := range src.Rows {
-		row := r.Clone().WithIndex(idx)
+		row := r.Clone()
 		df.AddRow(a.callback(src.State, row))
-		idx += 1
 	}
 
 	return df, nil

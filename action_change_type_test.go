@@ -6,10 +6,10 @@ import (
 	"github.com/DecxBase/framed"
 )
 
-func TestTableChangeColumnType(t *testing.T) {
-	df := SampleTestTable(t)
+func TestTableChangeType(t *testing.T) {
+	df := SampleTestTable()
 	newDF, err := df.Execute(
-		framed.ChangeColumnType("age", "", func(s *framed.State, r *framed.Row, a any) string {
+		framed.ChangeType("age", "", func(_ *framed.State, _ *framed.Row, a any) string {
 			v := a.(int32)
 			if v > 18 {
 				return "adult"

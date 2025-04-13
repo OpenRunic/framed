@@ -7,7 +7,7 @@ import (
 
 func TestTableRowPutValue(t *testing.T) {
 	colIndex := 3
-	df := SampleTestTable(t)
+	df := SampleTestTable()
 	row := df.First()
 	def := df.State.DefinitionAt(colIndex)
 	err := row.Patch(def, colIndex, "")
@@ -15,7 +15,7 @@ func TestTableRowPutValue(t *testing.T) {
 	if err == nil {
 		t.Error("expected error on invalid value set, got none")
 	} else {
-		r, err := row.Pick(df.State, "age")
+		r, err := row.CloneP(df.State, "age")
 		if err != nil {
 			t.Error(err)
 		} else {

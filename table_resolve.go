@@ -51,7 +51,7 @@ func (t *Table) SetDefinition(name string, def *ColumnDefinition) *ColumnDefinit
 }
 
 // resolve the type of column value if not defined
-func (t *Table) ResolveDefinition(idx int, name string, tp reflect.Type) *ColumnDefinition {
+func (t *Table) ResolveDefinition(name string, tp reflect.Type) *ColumnDefinition {
 	def := t.State.Definition(name)
 	if def != nil {
 		return def

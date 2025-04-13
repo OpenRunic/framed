@@ -77,7 +77,7 @@ func (t *Table) Insert(b []byte) error {
 
 // insert string line as row
 func (t *Table) InsertLine(line string) error {
-	return t.InsertSlice(SplitAtChar(line, byte(t.Options.Separator)))
+	return t.InsertSlice(SplitAtChar(line, t.Options.Separator))
 }
 
 // insert slice of strings as row

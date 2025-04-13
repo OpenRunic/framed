@@ -8,7 +8,7 @@ import (
 )
 
 func TestTableAddColumn(t *testing.T) {
-	df := SampleTestTable(t)
+	df := SampleTestTable()
 	newDF, err := df.Execute(
 		framed.AddColumn("name", "", func(s *framed.State, r *framed.Row) string {
 			return fmt.Sprintf("%s %s", r.At(s.Index("last_name")), r.At(s.Index("first_name")))

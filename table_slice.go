@@ -40,10 +40,8 @@ func (t *Table) Chunk(start int, end int) *Table {
 	df := t.CloneE()
 	rows := t.Slice(start, end)
 
-	idx := 0
-	for _, r := range rows {
+	for idx, r := range rows {
 		df.AddRow(r.Clone().WithIndex(idx))
-		idx += 1
 	}
 
 	return df
@@ -55,7 +53,7 @@ func (t *Table) Chunks(limit int) iter.Seq2[int, *Table] {
 		count := t.Length()
 		pages := count / limit
 		if count > (pages * limit) {
-			pages += 1
+			pages++
 		}
 
 		for i := range pages {

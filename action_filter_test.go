@@ -8,9 +8,9 @@ import (
 
 func TestTableFilterRows(t *testing.T) {
 	limit := 10
-	df := SampleTestTable(t)
+	df := SampleTestTable()
 	newDF, err := df.Execute(
-		framed.Filter(func(s *framed.State, r *framed.Row) bool {
+		framed.Filter(func(_ *framed.State, r *framed.Row) bool {
 			return r.Index < limit
 		}),
 	)

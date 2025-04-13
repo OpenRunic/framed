@@ -6,7 +6,7 @@ import (
 )
 
 func TestTableClone(t *testing.T) {
-	df := SampleTestTable(t)
+	df := SampleTestTable()
 	cloned := df.Clone()
 
 	if !reflect.DeepEqual(df, cloned) {
@@ -14,9 +14,9 @@ func TestTableClone(t *testing.T) {
 	}
 }
 
-func TestTableCloneP(t *testing.T) {
-	df := SampleTestTable(t)
-	cloned := df.CloneP()
+func TestTableCloneOptionsDefinitions(t *testing.T) {
+	df := SampleTestTable()
+	cloned := df.CloneO()
 
 	if !reflect.DeepEqual(df.State, cloned.State) {
 		t.Error("unable to produce identical clone state of table")
@@ -29,8 +29,8 @@ func TestTableCloneP(t *testing.T) {
 	}
 }
 
-func TestTableCloneE(t *testing.T) {
-	df := SampleTestTable(t)
+func TestTableCloneWithoutRows(t *testing.T) {
+	df := SampleTestTable()
 	cloned := df.CloneE()
 
 	if !reflect.DeepEqual(df.State, cloned.State) {

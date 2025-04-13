@@ -8,9 +8,9 @@ import (
 
 func TestTableModifyRows(t *testing.T) {
 	inc := 100
-	df := SampleTestTable(t)
+	df := SampleTestTable()
 	newDF, err := df.Execute(
-		framed.ModifyRow(func(s *framed.State, r *framed.Row) *framed.Row {
+		framed.ModifyRow(func(_ *framed.State, r *framed.Row) *framed.Row {
 			r.Set(0, framed.ColumnValue(r, 0, 0)+inc)
 			return r
 		}),

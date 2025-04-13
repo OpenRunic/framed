@@ -21,14 +21,12 @@ func (a ActionAddColumn[T]) Execute(src *Table) (*Table, error) {
 	df := src.CloneE()
 	pos := src.ColLength()
 
-	df.ResolveDefinition(pos, a.name, a.dataType)
+	df.ResolveDefinition(a.name, a.dataType)
 	df.AppendColumn(pos, a.name)
 
-	idx := 0
 	for _, r := range src.Rows {
-		row := r.Clone().WithIndex(idx)
-		df.AddRow(row.AddColumn(a.name, a.callback(df.State, row)))
-		idx += 1
+		row := r.Clone()
+		df.AddRow(row.AddColumn(a.callback(df.State, row)))
 	}
 
 	return df, nil
