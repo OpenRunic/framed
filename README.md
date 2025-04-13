@@ -1,4 +1,4 @@
-![Test Status](https://github.com/OpenRunic/framed/actions/workflows/go.yml/badge.svg)
+![Test Status](https://github.com/OpenRunic/framed/actions/workflows/lint-test.yml/badge.svg)
 
 ## Docs
 Data manipulation library inspired from Pandas (Python)
