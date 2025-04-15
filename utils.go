@@ -4,7 +4,7 @@ import (
 	"slices"
 )
 
-// convert slices of T to slices of K
+// SliceMap converts slices of T to slices of K
 func SliceMap[T any, K any](src []T, cb func(T) K) []K {
 	result := make([]K, len(src))
 
@@ -15,7 +15,7 @@ func SliceMap[T any, K any](src []T, cb func(T) K) []K {
 	return result
 }
 
-// convert slices of T to map of L[M]
+// SliceKeyMap convert slices of T to map of L[M]
 func SliceKeyMap[T any, L comparable, M any](src []T, cb func(T, int) (L, M)) map[L]M {
 	result := make(map[L]M)
 
@@ -27,7 +27,7 @@ func SliceKeyMap[T any, L comparable, M any](src []T, cb func(T, int) (L, M)) ma
 	return result
 }
 
-// filter slice values based on fallback func
+// SliceFilter filters slice values based on filter func
 func SliceFilter[T any](src []T, cb func(T) bool) []T {
 	result := make([]T, 0)
 
@@ -40,14 +40,14 @@ func SliceFilter[T any](src []T, cb func(T) bool) []T {
 	return result
 }
 
-// pick selectives from slice
+// SlicePick picks slice values
 func SlicePick[T comparable](src []T, keys []T) []T {
 	return SliceFilter(src, func(t T) bool {
 		return slices.Contains(keys, t)
 	})
 }
 
-// omit selectives from slice
+// SlicePick omits slice values
 func SliceOmit[T comparable](src []T, keys []T) []T {
 	return SliceFilter(src, func(t T) bool {
 		return !slices.Contains(keys, t)

@@ -1,12 +1,17 @@
 package framed
 
-// PipelineAction defines an interface to modify table data and options
+// PipelineAction defines an action interface to modify
+// table rows and options as needed.
 type PipelineAction interface {
-	ExecName() string
+
+	// ActionName returns the name of pipeline action
+	ActionName() string
+
+	// Execute executes the pipeline action
 	Execute(*Table) (*Table, error)
 }
 
-// Execute is called by Table when pipeline actions are executed
+// Execute is called by [Table] when pipeline actions are executed
 func (t *Table) Execute(actions ...PipelineAction) (*Table, error) {
 	df := t
 
@@ -21,7 +26,7 @@ func (t *Table) Execute(actions ...PipelineAction) (*Table, error) {
 	return df, nil
 }
 
-// Runs pipeline actions and points the resulting table back to self
+// ExecuteS runs pipeline actions and dereferences the resulting [Table] back to self
 func (t *Table) ExecuteS(actions ...PipelineAction) error {
 	df, err := t.Execute(actions...)
 

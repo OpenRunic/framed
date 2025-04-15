@@ -5,7 +5,7 @@ import (
 	"slices"
 )
 
-// table row data
+// Row holds columns of row in table
 type Row struct {
 
 	// index of row in table
@@ -15,26 +15,32 @@ type Row struct {
 	Columns []any
 }
 
+// WithIndex updates the row index in table
 func (r *Row) WithIndex(idx int) *Row {
 	r.Index = idx
 	return r
 }
 
+// AddColumn appends new column value to row
 func (r *Row) AddColumn(value any) *Row {
 	r.Columns = append(r.Columns, value)
 	return r
 }
 
+// At gives access to column at x index
 func (r *Row) At(idx int) any {
 	return r.Columns[idx]
 }
 
+// Set updates column value at x index
 func (r *Row) Set(idx int, value any) *Row {
 	r.Columns[idx] = value
 	return r
 }
 
-func (r *Row) Patch(def *ColumnDefinition, idx int, value any) error {
+// Patch attempts to update column value at x index
+// and throws error on type fail
+func (r *Row) Patch(def *Definition, idx int, value any) error {
 	tp := ToType(value)
 	if def.Type != tp {
 		return ColError(
@@ -48,7 +54,7 @@ func (r *Row) Patch(def *ColumnDefinition, idx int, value any) error {
 	return nil
 }
 
-// encode the slice of any as slice of strings
+// AsSlice encodes columns to slice of strings or throws error
 func (r *Row) AsSlice(s *State) ([]string, error) {
 	colCount := len(r.Columns)
 	values := make([]string, colCount)
@@ -64,7 +70,7 @@ func (r *Row) AsSlice(s *State) ([]string, error) {
 	return values, nil
 }
 
-// pick only provided columns from the row
+// Pick selects provided columns from the row or throws error
 func (r *Row) Pick(s *State, names ...string) ([]any, error) {
 	cols := slices.Clone(names)
 	if len(cols) < 1 {
@@ -85,7 +91,7 @@ func (r *Row) Pick(s *State, names ...string) ([]any, error) {
 	return columns, nil
 }
 
-// clone the row with only selected columns
+// CloneP create duplicate row from selected columns
 func (r *Row) CloneP(s *State, names ...string) (*Row, error) {
 	columns, err := r.Pick(s, names...)
 	if err != nil {
@@ -98,7 +104,7 @@ func (r *Row) CloneP(s *State, names ...string) (*Row, error) {
 	}, nil
 }
 
-// clone the row as-is
+// Clone duplicates the row as-is
 func (r *Row) Clone() *Row {
 	return &Row{
 		Index:   r.Index,

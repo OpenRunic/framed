@@ -5,7 +5,7 @@ import (
 	"iter"
 )
 
-// use reader to load data into table
+// Read accepts [io.Reader] to loads data into table
 func (t *Table) Read(r io.Reader) error {
 	var n int
 	var err error
@@ -32,7 +32,7 @@ func (t *Table) Read(r io.Reader) error {
 	return nil
 }
 
-// convert slice of values to column slices
+// SliceToColumns convert slice of values to column slices
 func (t *Table) SliceToColumns(values []string) ([]any, error) {
 	hLen := t.ColLength()
 	columns := make([]any, len(values))
@@ -50,7 +50,7 @@ func (t *Table) SliceToColumns(values []string) ([]any, error) {
 	return columns, nil
 }
 
-// make column info for provided value
+// AsColumn builds column info for provided value
 func (t *Table) AsColumn(idx int, value string) (any, error) {
 	def := t.State.Definition(t.State.ColumnName(idx))
 	val, err := ColumnValueDecoder(def, value)
@@ -64,23 +64,23 @@ func (t *Table) AddRow(rows ...*Row) {
 	t.Rows = append(t.Rows, rows...)
 }
 
-// add new column info to state
+// AppendColumn adds new column to table
 func (t *Table) AppendColumn(pos int, name string) {
 	t.State.Indexes[name] = pos
 	t.State.Columns = append(t.State.Columns, name)
 }
 
-// insert byte data as row
+// Insert adds line of bytes as row
 func (t *Table) Insert(b []byte) error {
 	return t.InsertLine(string(b))
 }
 
-// insert string line as row
+// InsertLine adds string line as row
 func (t *Table) InsertLine(line string) error {
 	return t.InsertSlice(SplitAtChar(line, t.Options.Separator))
 }
 
-// insert slice of strings as row
+// InsertSlice adds slice of strings as row
 func (t *Table) InsertSlice(values []string) error {
 	line := t.Length()
 	if line == 0 {
@@ -114,7 +114,7 @@ func (t *Table) InsertSlice(values []string) error {
 	return nil
 }
 
-// insert list of lines
+// InsertLines iterates list of string lines
 func (t *Table) InsertLines(lines []string) error {
 	for _, line := range lines {
 		if t.IsAtMaxLine() {
@@ -130,7 +130,7 @@ func (t *Table) InsertLines(lines []string) error {
 	return nil
 }
 
-// insert list of slices
+// InsertSlices iterates list of string slice
 func (t *Table) InsertSlices(ss [][]string) error {
 	for _, s := range ss {
 		if t.IsAtMaxLine() {
@@ -146,7 +146,7 @@ func (t *Table) InsertSlices(ss [][]string) error {
 	return nil
 }
 
-// insert list of bytes from provided iterator
+// InsertGenBytes iterates bytes from iterator
 func (t *Table) InsertGenBytes(it iter.Seq[[]byte]) error {
 	for b := range it {
 		if t.IsAtMaxLine() {

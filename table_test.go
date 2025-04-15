@@ -6,7 +6,7 @@ import (
 
 	"fmt"
 
-	"github.com/DecxBase/framed"
+	"github.com/OpenRunic/framed"
 )
 
 const stringSet = "abcdefghijklmnopqrstuvwxyz" +

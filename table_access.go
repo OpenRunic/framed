@@ -1,26 +1,26 @@
 package framed
 
-// number of rows
+// Length return number of total rows
 func (t *Table) Length() int {
 	return len(t.Rows)
 }
 
-// number of columns
+// ColLength returns number of columns
 func (t *Table) ColLength() int {
 	return len(t.State.Columns)
 }
 
-// check table is empty
-func (t *Table) Empty() bool {
+// IsEmpty verifies if table is empty
+func (t *Table) IsEmpty() bool {
 	return t.Length() == 0 || t.ColLength() == 0
 }
 
-// get row at provided index
+// At retrieves row at x index
 func (t *Table) At(idx int) *Row {
 	return t.Rows[idx]
 }
 
-// check table is already at restricted max line count
+// IsAtMaxLine checks rows are already at restricted max limit
 func (t *Table) IsAtMaxLine() bool {
 	if t.Options.MaxRows < 0 {
 		return false
@@ -29,7 +29,7 @@ func (t *Table) IsAtMaxLine() bool {
 	return t.Length() >= t.Options.MaxRows
 }
 
-// check is resolved
+// IsResolved checks table is resolved
 func (t *Table) IsResolved() bool {
 	return t.resolved
 }

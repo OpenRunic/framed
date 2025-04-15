@@ -1,16 +1,15 @@
 package framed
 
-// pipeline action to filter the rows based on callback
-type ActionFilter struct {
+type ActionFilterRow struct {
 	callback func(*State, *Row) bool
 }
 
-func (a ActionFilter) ExecName() string {
+func (a ActionFilterRow) ActionName() string {
 	return "filter"
 }
 
-func (a ActionFilter) Execute(src *Table) (*Table, error) {
-	if src.Empty() {
+func (a ActionFilterRow) Execute(src *Table) (*Table, error) {
+	if src.IsEmpty() {
 		return src.CloneE(), nil
 	}
 
@@ -26,6 +25,14 @@ func (a ActionFilter) Execute(src *Table) (*Table, error) {
 	return CherryPick(src, src.State.Columns, filtered)
 }
 
-func Filter(cb func(*State, *Row) bool) *ActionFilter {
-	return &ActionFilter{cb}
+// FilterRow iterates through all rows, filters the rows
+// and build a new table.
+//
+//	newTable, err := table.Execute(
+//		...
+//		framed.FilterRow(func(*framed.State, *framed.Row) bool),
+//		...
+//	)
+func FilterRow(cb func(*State, *Row) bool) *ActionFilterRow {
+	return &ActionFilterRow{cb}
 }

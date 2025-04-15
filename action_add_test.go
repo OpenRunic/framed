@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/DecxBase/framed"
+	"github.com/OpenRunic/framed"
 )
 
-func TestTableAddColumn(t *testing.T) {
+func TestActionAddColumn(t *testing.T) {
 	df := SampleTestTable()
 	newDF, err := df.Execute(
 		framed.AddColumn("name", "", func(s *framed.State, r *framed.Row) string {

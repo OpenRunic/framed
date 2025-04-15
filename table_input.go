@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-// create table from file path
+// File opens file and creates table
 func File(path string, cbs ...OptionCallback) (*Table, error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -16,7 +16,7 @@ func File(path string, cbs ...OptionCallback) (*Table, error) {
 	return Reader(file, cbs...)
 }
 
-// create table from external uri
+// URL sends http request to url and creates table
 func URL(uri string, cbs ...OptionCallback) (*Table, error) {
 	response, err := http.Get(uri)
 	if err != nil {
@@ -26,7 +26,7 @@ func URL(uri string, cbs ...OptionCallback) (*Table, error) {
 	return Reader(response.Body, cbs...)
 }
 
-// create table from io.Reader or io.ReadCloser
+// Reader iterates through [io.Reader] and creates table
 func Reader(r io.Reader, cbs ...OptionCallback) (*Table, error) {
 	c, ok := r.(io.ReadCloser)
 	if ok {
@@ -43,7 +43,7 @@ func Reader(r io.Reader, cbs ...OptionCallback) (*Table, error) {
 	return df, nil
 }
 
-// create table from slice of strings
+// Lines imports slices of string to create table
 func Lines(lines []string, cbs ...OptionCallback) (*Table, error) {
 	df := New(cbs...)
 
@@ -55,7 +55,7 @@ func Lines(lines []string, cbs ...OptionCallback) (*Table, error) {
 	return df, nil
 }
 
-// create table from slice of raw data
+// Raw imports slices of raw data to create table
 func Raw(ss [][]string, cbs ...OptionCallback) (*Table, error) {
 	df := New(cbs...)
 

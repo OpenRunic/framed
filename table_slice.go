@@ -5,12 +5,12 @@ import (
 	"slices"
 )
 
-// access slice of rows
+// Slice retrieves slice of rows at given start and end
 func (t *Table) Slice(start int, end int) []*Row {
 	return t.Rows[start:end]
 }
 
-// access slice of rows in reverse
+// RSlice retrieves slice of rows at given start and end but reverse
 func (t *Table) RSlice(start int, end int) []*Row {
 	rows := make([]*Row, t.Length())
 	_ = copy(rows, t.Rows)
@@ -19,23 +19,27 @@ func (t *Table) RSlice(start int, end int) []*Row {
 	return rows[start:end]
 }
 
+// First returns the first [Row] of table
 func (t *Table) First() *Row {
 	return t.At(0)
 }
 
+// Last returns the last [Row] of table
 func (t *Table) Last() *Row {
 	return t.At(t.Length() - 1)
 }
 
+// Head returns the first n [Row] of table
 func (t *Table) Head(limit int) []*Row {
 	return t.Slice(0, limit)
 }
 
+// Tail returns the last n [Row] of table
 func (t *Table) Tail(limit int) []*Row {
 	return t.RSlice(0, limit)
 }
 
-// build new table from provided slice indexes
+// Chunk build new table from provided slice indexes
 func (t *Table) Chunk(start int, end int) *Table {
 	df := t.CloneE()
 	rows := t.Slice(start, end)
@@ -47,7 +51,7 @@ func (t *Table) Chunk(start int, end int) *Table {
 	return df
 }
 
-// split table into multiple chunk of tables from provided slice indexes
+// Chunks split table into multiple chunk of tables from provided slice indexes
 func (t *Table) Chunks(limit int) iter.Seq2[int, *Table] {
 	return func(yield func(int, *Table) bool) {
 		count := t.Length()

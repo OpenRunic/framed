@@ -6,7 +6,7 @@ import (
 	"slices"
 )
 
-// options for resolving table data
+// Options defines settings for table data
 type Options struct {
 
 	// sample rows count
@@ -28,14 +28,16 @@ type Options struct {
 	Columns []string
 
 	// pre-defined column definitions
-	Definitions map[string]*ColumnDefinition
+	Definitions map[string]*Definition
 
 	// helper to read column type
 	TypeReader func(int, string) reflect.Type
 }
 
+// OptionCallback defines function signature for option builder
 type OptionCallback = func(*Options)
 
+// Clone duplicates the options as new instance
 func (o *Options) Clone() *Options {
 	return &Options{
 		MaxRows:      o.MaxRows,
@@ -49,6 +51,7 @@ func (o *Options) Clone() *Options {
 	}
 }
 
+// NewOptions creates option's instance using [OptionCallback]
 func NewOptions(ocbs ...OptionCallback) *Options {
 	options := &Options{
 		Sampling:     2,
@@ -56,7 +59,7 @@ func NewOptions(ocbs ...OptionCallback) *Options {
 		MaxRows:      -1,
 		Separator:    ',',
 		IgnoreHeader: false,
-		Definitions:  make(map[string]*ColumnDefinition, 0),
+		Definitions:  make(map[string]*Definition, 0),
 	}
 
 	for _, cb := range ocbs {
@@ -108,7 +111,7 @@ func WithTypeReader(cb func(int, string) reflect.Type) OptionCallback {
 	}
 }
 
-func WithDefinition(name string, def *ColumnDefinition) OptionCallback {
+func WithDefinition(name string, def *Definition) OptionCallback {
 	return func(o *Options) {
 		o.Definitions[name] = def
 	}

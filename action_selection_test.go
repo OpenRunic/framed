@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/DecxBase/framed"
+	"github.com/OpenRunic/framed"
 )
 
 func TestTablePickColumns(t *testing.T) {

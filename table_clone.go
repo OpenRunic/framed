@@ -1,20 +1,13 @@
 package framed
 
-// clone table as-is
+// Clone duplicates table as-is
 func (t *Table) Clone() *Table {
 	df := t.CloneE()
 	df.Rows = append(df.Rows, t.Rows...)
 	return df
 }
 
-// clone table with state and options but resolved
-func (t *Table) CloneO() *Table {
-	return New().
-		SetState(t.State.Clone()).
-		SetOptions(t.Options.Clone())
-}
-
-// clone table as-is without rows
+// CloneE duplicates table as-is without rows
 func (t *Table) CloneE() *Table {
 	return &Table{
 		resolved: t.resolved,
@@ -24,9 +17,10 @@ func (t *Table) CloneE() *Table {
 	}
 }
 
-// cherry pick the columns and build table
+// CherryPick selects the columns and assigns new
+// rows for those columns to build new [Table]
 func CherryPick(src *Table, columns []string, rows []*Row) (*Table, error) {
-	df := src.CloneO()
+	df := src.CloneE().MarkUnresolved()
 
 	if !src.State.IsEmpty() {
 		df.UseColumns(SlicePick(src.State.Columns, columns))

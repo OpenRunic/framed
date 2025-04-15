@@ -6,7 +6,7 @@ import (
 	"slices"
 )
 
-// initialize the options on table instance
+// Initialize executes the options on table instance
 func (t *Table) Initialize() *Table {
 	if t.Options.Columns != nil {
 		t.UseColumns(t.Options.Columns)
@@ -22,36 +22,36 @@ func (t *Table) Initialize() *Table {
 	return t
 }
 
+// SetState overrides the [State] of table
 func (t *Table) SetState(s *State) *Table {
 	t.State = s
 	return t
 }
 
+// SetOptions overrides the [Options] of table
 func (t *Table) SetOptions(opts *Options) *Table {
 	t.Options = opts
 	return t
 }
 
+// SetColumns updates the header columns for table
 func (t *Table) SetColumns(cols []string) {
 	t.State.Columns = cols
 }
 
+// SetIndexes updates the column indexes for table
 func (t *Table) SetIndexes(cache IndexCache) {
 	t.State.Indexes = cache
 }
 
-func (t *Table) SetDefinitions(defs map[string]*ColumnDefinition) *Table {
-	t.State.Definitions = defs
-	return t
-}
-
-func (t *Table) SetDefinition(name string, def *ColumnDefinition) *ColumnDefinition {
+// SetDefinition assigns [Definition] for the column
+func (t *Table) SetDefinition(name string, def *Definition) *Definition {
 	t.State.Definitions[name] = def
 	return def
 }
 
-// resolve the type of column value if not defined
-func (t *Table) ResolveDefinition(name string, tp reflect.Type) *ColumnDefinition {
+// ResolveDefinition stores the column [Definition] if it doesn't exist
+func (t *Table) ResolveDefinition(name string, tp reflect.Type) *Definition {
 	def := t.State.Definition(name)
 	if def != nil {
 		return def
@@ -62,8 +62,8 @@ func (t *Table) ResolveDefinition(name string, tp reflect.Type) *ColumnDefinitio
 	return t.State.Definition(name)
 }
 
-// detect and resolve the type of column value
-func (t *Table) ResolveValueDefinition(idx int, name string, value string) *ColumnDefinition {
+// ResolveValueDefinition detects data type of column value and creates [Definition]
+func (t *Table) ResolveValueDefinition(idx int, name string, value string) *Definition {
 	def := t.State.Definition(name)
 	if def != nil {
 		return def
@@ -88,7 +88,7 @@ func (t *Table) ResolveValueDefinition(idx int, name string, value string) *Colu
 	return t.State.Definition(name)
 }
 
-// resolve the data types from the column values
+// ResolveTypes resolves the data types from the column values
 func (t *Table) ResolveTypes(names []string, values []string) error {
 	if !t.resolved {
 		t.resolved = true
@@ -105,7 +105,7 @@ func (t *Table) ResolveTypes(names []string, values []string) error {
 	return nil
 }
 
-// save and resolve columns from provided values
+// UseColumns updates header columns for table
 func (t *Table) UseColumns(values []string) {
 	cache := make(IndexCache)
 	for idx, col := range values {
@@ -114,4 +114,10 @@ func (t *Table) UseColumns(values []string) {
 
 	t.SetColumns(slices.Clone(values))
 	t.SetIndexes(cache)
+}
+
+// MarkUnresolved marks table as unresolved
+func (t *Table) MarkUnresolved() *Table {
+	t.resolved = false
+	return t
 }

@@ -3,14 +3,14 @@ package framed_test
 import (
 	"testing"
 
-	"github.com/DecxBase/framed"
+	"github.com/OpenRunic/framed"
 )
 
 func TestTableFilterRows(t *testing.T) {
 	limit := 10
 	df := SampleTestTable()
 	newDF, err := df.Execute(
-		framed.Filter(func(_ *framed.State, r *framed.Row) bool {
+		framed.FilterRow(func(_ *framed.State, r *framed.Row) bool {
 			return r.Index < limit
 		}),
 	)

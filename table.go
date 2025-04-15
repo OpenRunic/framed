@@ -1,14 +1,21 @@
 package framed
 
-type IndexCache = map[string]int
-
 type Table struct {
+
+	// internal state to mark data types are resolved
 	resolved bool
-	Rows     []*Row
-	State    *State
-	Options  *Options
+
+	// slice of table rows
+	Rows []*Row
+
+	// current state of table
+	State *State
+
+	// current resolved options for table
+	Options *Options
 }
 
+// New creates new [Table] instance with [OptionCallback]
 func New(ocbs ...OptionCallback) *Table {
 	return (&Table{
 		resolved: false,
@@ -17,7 +24,7 @@ func New(ocbs ...OptionCallback) *Table {
 		State: &State{
 			Indexes:     make(IndexCache),
 			Columns:     make([]string, 0),
-			Definitions: make(map[string]*ColumnDefinition, 0),
+			Definitions: make(map[string]*Definition, 0),
 		},
 	}).Initialize()
 }

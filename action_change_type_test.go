@@ -3,14 +3,14 @@ package framed_test
 import (
 	"testing"
 
-	"github.com/DecxBase/framed"
+	"github.com/OpenRunic/framed"
 )
 
-func TestTableChangeType(t *testing.T) {
+func TestActionChangeColumnType(t *testing.T) {
 	df := SampleTestTable()
 	newDF, err := df.Execute(
-		framed.ChangeType("age", "", func(_ *framed.State, _ *framed.Row, a any) string {
-			v := a.(int32)
+		framed.ChangeColumnType("age", "", func(_ *framed.State, _ *framed.Row, a any) string {
+			v := a.(int64)
 			if v > 18 {
 				return "adult"
 			} else if v > 12 {

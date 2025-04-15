@@ -2,12 +2,11 @@ package framed
 
 type ModifyTableDataReader = func(*State, *Row) *Row
 
-// pipeline action to modify every row in table
 type ActionModifyRow struct {
 	callback ModifyTableDataReader
 }
 
-func (a ActionModifyRow) ExecName() string {
+func (a ActionModifyRow) ActionName() string {
 	return "modify_row"
 }
 
@@ -22,6 +21,14 @@ func (a ActionModifyRow) Execute(src *Table) (*Table, error) {
 	return df, nil
 }
 
+// ModifyRow iterates through all rows to modify the
+// row and generates the new table.
+//
+//	newTable, err := table.Execute(
+//		...
+//		framed.ModifyRow(func(*State, *Row) *Row),
+//		...
+//	)
 func ModifyRow(cb ModifyTableDataReader) *ActionModifyRow {
 	return &ActionModifyRow{
 		callback: cb,

@@ -16,7 +16,7 @@ func TestTableClone(t *testing.T) {
 
 func TestTableCloneOptionsDefinitions(t *testing.T) {
 	df := SampleTestTable()
-	cloned := df.CloneO()
+	cloned := df.CloneE().MarkUnresolved()
 
 	if !reflect.DeepEqual(df.State, cloned.State) {
 		t.Error("unable to produce identical clone state of table")

@@ -3,7 +3,7 @@ package framed_test
 import (
 	"testing"
 
-	"github.com/DecxBase/framed"
+	"github.com/OpenRunic/framed"
 )
 
 func TestTableRenameColumn(t *testing.T) {

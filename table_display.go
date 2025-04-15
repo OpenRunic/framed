@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// String generates printable stats about the table
 func (t *Table) String() string {
 	rows := t.Length()
 	sampleSize := t.Options.SampleSize

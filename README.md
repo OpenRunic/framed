@@ -1,15 +1,16 @@
-### Table by OpenRunic
+## Table
+---
+
 ![Test Status](https://github.com/OpenRunic/framed/actions/workflows/lint-test.yml/badge.svg)
 
-### Docs
-Data manipulation library inspired from Pandas (Python)
+Data manipulation library inspired from Pandas (Python) for golang
 
 #### Download
 ```
 go get -u github.com/OpenRunic/framed
 ```
 
-#### Table Options
+#### Options
 ---
 
 ```go
@@ -83,8 +84,8 @@ updateAction := framed.ChangeOptions(func(tbl *Table) (*Table, error) {
 })
 
 // change column type action
-changeTypeAction := framed.ChangeType("age", "", func(s *framed.State, r *framed.Row, a any) string {
-  v := a.(int32)
+changeColTypeAction := framed.ChangeColumnType("age", "", func(s *framed.State, r *framed.Row, a any) string {
+  v := a.(int64)
   if v > 18 {
     return "adult"
   } else if v > 12 {
@@ -101,7 +102,7 @@ modifyAction := framed.ModifyRow(func(s *framed.State, r *framed.Row) *framed.Ro
 })
 
 // filter rows from table action
-filterAction := framed.Filter(func(s *framed.State, r *framed.Row) bool {
+filterAction := framed.FilterRow(func(s *framed.State, r *framed.Row) bool {
   return r.Index > 9 // ignore first 10 rows
 })
 
@@ -113,7 +114,7 @@ newTable, err := table.Execute(
   pickAction,
   omitAction,
   updateAction,
-  changeTypeAction,
+  changeColTypeAction,
   modifyAction,
   filterAction,
 )

@@ -1,13 +1,12 @@
 package framed
 
-// pipeline action to cherry-pick columns
 type ActionSelection struct {
 	name     string
 	columns  []string
 	callback func(*Table, []string) []string
 }
 
-func (a ActionSelection) ExecName() string {
+func (a ActionSelection) ActionName() string {
 	if len(a.name) > 0 {
 		return a.name
 	}
@@ -36,12 +35,26 @@ func ColumnSelectionCallback(name string, callback func(*Table, []string) []stri
 	return &ActionSelection{name, columns, callback}
 }
 
-// pipeline action to pick only provided columns
+// PickColumn plucks the specified columns and
+// generates the new table.
+//
+//	newTable, err := table.Execute(
+//		...
+//		framed.PickColumn("col1", "col2", ...),
+//		...
+//	)
 func PickColumn(columns ...string) *ActionSelection {
 	return ColumnSelection("pick_column", columns...)
 }
 
-// pipeline action to drop provided columns
+// DropColumn ignores the specified columns and
+// generates the new table.
+//
+//	newTable, err := table.Execute(
+//		...
+//		framed.DropColumn("col1", "col2", ...),
+//		...
+//	)
 func DropColumn(columns ...string) *ActionSelection {
 	return ColumnSelectionCallback("drop_column", func(src *Table, s []string) []string {
 		return SliceOmit(src.State.Columns, s)

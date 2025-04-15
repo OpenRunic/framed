@@ -31,7 +31,12 @@ func (e TableError) Error() string {
 	return msg
 }
 
-// makes default table error info
+// NewError will create an error instance along with the reason.
+//
+//	$0 : main originating error
+//	$1 : reason of the error
+//
+//	err := NewError($0, $1, $2, $3, $4)
 func NewError(err error, reason string) TableError {
 	return TableError{
 		Reason: reason,
@@ -40,7 +45,14 @@ func NewError(err error, reason string) TableError {
 	}
 }
 
-// makes row error info
+// RowError will create an error instance with info about
+// row along with the reason.
+//
+//	$0 : index of row
+//	$1 : main originating error
+//	$2 : reason of the error
+//
+//	err := RowError($0, $1, $2, $3, $4)
 func RowError(idx int, err error, reason string) TableError {
 	return TableError{
 		Row:    idx,
@@ -49,7 +61,16 @@ func RowError(idx int, err error, reason string) TableError {
 	}
 }
 
-// makes column error info
+// ColError will create an error instance with info about row
+// and column index and name(if provided) along with the reason.
+//
+//	$0 : index of row
+//	$1 : index of column
+//	$2 : name of column
+//	$3 : main originating error
+//	$4 : reason of the error
+//
+//	err := ColError($0, $1, $2, $3, $4)
 func ColError(idx int, idx2 int, col string, err error, reason string) *TableError {
 	return &TableError{
 		Row:     idx,

@@ -3,7 +3,7 @@ package framed_test
 import (
 	"testing"
 
-	"github.com/DecxBase/framed"
+	"github.com/OpenRunic/framed"
 )
 
 var testColSplitValue = `aa,bb,cc,dd,"test value, data value"`

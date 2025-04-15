@@ -19,7 +19,7 @@ func TestTableRowPutValue(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		} else {
-			if reflect.TypeOf(r.At(0)).Kind() != reflect.Int32 {
+			if reflect.TypeOf(r.At(0)).Kind() != reflect.Int64 {
 				t.Error("failed to clone and pick column from existing row")
 			}
 		}

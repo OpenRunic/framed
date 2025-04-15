@@ -6,6 +6,9 @@ import (
 	"slices"
 )
 
+// columns index cache type
+type IndexCache = map[string]int
+
 // current state of table
 type State struct {
 
@@ -16,15 +19,15 @@ type State struct {
 	Indexes IndexCache
 
 	// resolved column definitions
-	Definitions map[string]*ColumnDefinition
+	Definitions map[string]*Definition
 }
 
-// check is columns exist
+// IsEmpty checks if columns are available
 func (s *State) IsEmpty() bool {
 	return len(s.Columns) < 1
 }
 
-// get the current index of column
+// Index retrieves the index of column
 func (s *State) Index(name string) int {
 	idx, ok := s.Indexes[name]
 	if ok {
@@ -33,11 +36,12 @@ func (s *State) Index(name string) int {
 	return -1
 }
 
+// HasColumn checks if column is available
 func (s *State) HasColumn(name string) bool {
 	return s.Index(name) > -1
 }
 
-// get the name of column from index
+// ColumnName retrieves the name of column from index
 func (s *State) ColumnName(idx int) string {
 	if s.IsEmpty() || idx >= len(s.Columns) {
 		return ""
@@ -46,16 +50,19 @@ func (s *State) ColumnName(idx int) string {
 	return s.Columns[idx]
 }
 
+// HasDefinition checks if definition is available
 func (s *State) HasDefinition(name string) bool {
 	_, ok := s.Definitions[name]
 	return ok
 }
 
-func (s *State) Definition(name string) *ColumnDefinition {
+// Definition retrieves the value definition
+func (s *State) Definition(name string) *Definition {
 	return s.Definitions[name]
 }
 
-func (s *State) DefinitionAt(idx int) *ColumnDefinition {
+// DefinitionAt retrieves the value definition via index
+func (s *State) DefinitionAt(idx int) *Definition {
 	if idx >= len(s.Columns) {
 		return nil
 	}
@@ -63,12 +70,14 @@ func (s *State) DefinitionAt(idx int) *ColumnDefinition {
 	return s.Definitions[s.Columns[idx]]
 }
 
+// DataTypes returns the saved data types in definitions
 func (s *State) DataTypes() map[string]reflect.Type {
 	return SliceKeyMap(s.Columns, func(col string, _ int) (string, reflect.Type) {
 		return col, s.DataType(col)
 	})
 }
 
+// DataType returns data type for single value
 func (s *State) DataType(name string) reflect.Type {
 	def := s.Definition(name)
 	if def != nil {
@@ -78,6 +87,7 @@ func (s *State) DataType(name string) reflect.Type {
 	return nil
 }
 
+// Clone duplicates state to new instance
 func (s *State) Clone() *State {
 	return &State{
 		Columns:     slices.Clone(s.Columns),

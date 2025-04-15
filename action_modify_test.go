@@ -3,7 +3,7 @@ package framed_test
 import (
 	"testing"
 
-	"github.com/DecxBase/framed"
+	"github.com/OpenRunic/framed"
 )
 
 func TestTableModifyRows(t *testing.T) {
@@ -11,8 +11,7 @@ func TestTableModifyRows(t *testing.T) {
 	df := SampleTestTable()
 	newDF, err := df.Execute(
 		framed.ModifyRow(func(_ *framed.State, r *framed.Row) *framed.Row {
-			r.Set(0, framed.ColumnValue(r, 0, 0)+inc)
-			return r
+			return r.Set(0, framed.ColumnValue(r, 0, 0)+inc)
 		}),
 	)
 

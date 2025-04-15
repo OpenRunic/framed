@@ -9,17 +9,37 @@ import (
 	"strings"
 )
 
-var BoolToStringValues = []string{}
-var BoolTrueStringValues = []string{"1", "true", "yes", "y"}
-var BoolFalseStringValues = []string{"1", "false", "no", "n"}
+// BoolToStringValues contains slice of string
+// values that can be auto-translated to boolean
+var BoolToStringValues = []string{"1", "false", "no", "n"}
 
-func init() {
-	// copy data to build final set of boolable values
-	copy(BoolToStringValues, BoolTrueStringValues)
-	copy(BoolToStringValues, BoolFalseStringValues)
+// BoolTrueStringValues contains slice of string
+// value that can be auto-translated to true boolean
+var BoolTrueStringValues = []string{"1", "true", "yes", "y"}
+
+// StringTranslatableKinds contains slice of [reflect.Kind]
+// that can be translated to string
+var StringTranslatableKinds = []reflect.Kind{
+	reflect.String,
+	reflect.Int, reflect.Int32, reflect.Int64,
+	reflect.Float32, reflect.Float64,
+	reflect.Bool,
 }
 
-// detect the type of value
+func init() {
+	copy(BoolToStringValues, BoolTrueStringValues)
+}
+
+// ToType reads the [reflect.Type] from provided value
+func ToType[T any](v T) reflect.Type {
+	tp := reflect.TypeOf(v)
+	if tp.Kind() == reflect.Slice {
+		return tp.Elem()
+	}
+	return tp
+}
+
+// DetectValueType detects and returns [reflect.Type] of string value
 func DetectValueType(name string, value string) reflect.Type {
 	sLen := len(name)
 	sName := strings.ToLower(name)
@@ -35,7 +55,7 @@ func DetectValueType(name string, value string) reflect.Type {
 	if matched {
 		_, err := strconv.Atoi(value)
 		if err == nil {
-			return ToType[int32](0)
+			return ToType[int64](0)
 		}
 	}
 
@@ -50,7 +70,7 @@ func DetectValueType(name string, value string) reflect.Type {
 	return ToType("")
 }
 
-// parse int value
+// ParseInt converts string to int as base10 with variable bit size
 func ParseInt(s string, bitSize int) (int64, error) {
 	val, err := strconv.ParseInt(s, 10, bitSize)
 	if err != nil {
@@ -59,7 +79,7 @@ func ParseInt(s string, bitSize int) (int64, error) {
 	return val, nil
 }
 
-// convert the value to provided type (if possible)
+// ConvertValueType converts string to provided type or throws error
 func ConvertValueType(value string, tp reflect.Type) (any, error) {
 	kind := tp.Kind()
 	switch kind {
@@ -112,8 +132,9 @@ func ConvertValueType(value string, tp reflect.Type) (any, error) {
 	return value, nil
 }
 
-// encode the column value to string using column definition
-func ColumnValueEncoder(def *ColumnDefinition, value any) (string, error) {
+// ColumnValueEncoder encodes the column value to string
+// using definition or with default methods
+func ColumnValueEncoder(def *Definition, value any) (string, error) {
 	if def.Encoder != nil {
 		return def.Encoder(value)
 	}
@@ -125,8 +146,9 @@ func ColumnValueEncoder(def *ColumnDefinition, value any) (string, error) {
 	return "", fmt.Errorf("failed to encode %s value to string", def.Type)
 }
 
-// decode the column value from string using column definition
-func ColumnValueDecoder(def *ColumnDefinition, value string) (any, error) {
+// ColumnValueDecoder decodes the column value from string
+// using column definition or with default methods
+func ColumnValueDecoder(def *Definition, value string) (any, error) {
 	if def.Decoder != nil {
 		return def.Decoder(value)
 	}
