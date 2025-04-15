@@ -47,10 +47,10 @@ table, err := framed.File("path_to_file.csv")
 table, err := framed.URL("http_https_url...csv")
 
 // load table from io.Reader
-table, err := framed.Url(io.Reader)
+table, err := framed.Reader(io.Reader)
 
 // load table from slice of string
-table, err := framed.Url([]string{"1....", "2...."})
+table, err := framed.Lines([]string{"1....", "2...."})
 
 // load table from slice of raw data
 table, err := framed.Raw([][]string{{"1", "..."}, {"2", "..."}})
