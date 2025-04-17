@@ -1,0 +1,19 @@
+name: Update pkg.go.dev
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  update-pkg-go-dev:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update proxy.golang.org
+        run: GOPROXY=proxy.golang.org go list -m github.com/OpenRunic/framed@${{github.ref_name}}
+
+      # see https://pkg.go.dev/about#adding-a-package
+      - name: Update pkg.go.dev
+        run: |
+          ESCAPED_MODULE=$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]')
+          curl https://proxy.golang.org/github.com/$ESCAPED_MODULE/@v/$GITHUB_REF_NAME.info

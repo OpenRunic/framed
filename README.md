@@ -1,7 +1,7 @@
 ## Table
 ---
 
-![Test Status](https://github.com/OpenRunic/framed/actions/workflows/lint-test.yml/badge.svg)
+![Push Status](https://github.com/OpenRunic/framed/actions/workflows/master-push.yml/badge.svg)
 
 Data manipulation library inspired from Pandas (Python) for golang
 
