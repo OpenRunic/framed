@@ -11,3 +11,7 @@ test:
 .PHONY: docs
 docs:
 	@godoc -http=:8080
+
+.PHONY: publish
+publish:
+	GOPROXY=proxy.golang.org go list -m github.com/OpenRunic/framed@${tag}

@@ -128,7 +128,7 @@ newTable, err := table.Execute(
 table.UseColumns([]string{"col1", "col2", ...., "colN"})
 
 // add row to table
-table.AddRow(*framed.Row{...})
+table.AddRow(&framed.Row{...})
 
 // get first rows as new table
 df := table.Chunk(0, 100)
