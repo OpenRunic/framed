@@ -29,16 +29,6 @@ func (t *Table) Last() *Row {
 	return t.At(t.Length() - 1)
 }
 
-// Head returns the first n [Row] of table
-func (t *Table) Head(limit int) []*Row {
-	return t.Slice(0, limit)
-}
-
-// Tail returns the last n [Row] of table
-func (t *Table) Tail(limit int) []*Row {
-	return t.RSlice(0, limit)
-}
-
 // Chunk build new table from provided slice indexes
 func (t *Table) Chunk(start int, end int) *Table {
 	df := t.CloneE()

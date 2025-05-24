@@ -9,11 +9,14 @@ import (
 // Options defines settings for table data
 type Options struct {
 
-	// sample rows count
-	Sampling int
+	// Name of table
+	Name string
 
-	// printable sample size
+	// sample rows count
 	SampleSize int
+
+	// printable sample text length
+	SampleMaxLength int
 
 	// stop import at max defined count
 	MaxRows int
@@ -32,6 +35,12 @@ type Options struct {
 
 	// helper to read column type
 	TypeReader func(int, string) reflect.Type
+
+	// text to display for empty values
+	EmptyText string
+
+	// defines characters to use for table pretty print
+	PrettyFormatCharacters []rune
 }
 
 // OptionCallback defines function signature for option builder
@@ -40,26 +49,48 @@ type OptionCallback = func(*Options)
 // Clone duplicates the options as new instance
 func (o *Options) Clone() *Options {
 	return &Options{
-		MaxRows:      o.MaxRows,
-		Separator:    o.Separator,
-		Sampling:     o.Sampling,
-		SampleSize:   o.SampleSize,
-		IgnoreHeader: o.IgnoreHeader,
-		Columns:      slices.Clone(o.Columns),
-		Definitions:  maps.Clone(o.Definitions),
-		TypeReader:   o.TypeReader,
+		Name:                   o.Name,
+		MaxRows:                o.MaxRows,
+		Separator:              o.Separator,
+		SampleSize:             o.SampleSize,
+		SampleMaxLength:        o.SampleMaxLength,
+		IgnoreHeader:           o.IgnoreHeader,
+		EmptyText:              o.EmptyText,
+		Columns:                slices.Clone(o.Columns),
+		Definitions:            maps.Clone(o.Definitions),
+		TypeReader:             o.TypeReader,
+		PrettyFormatCharacters: o.PrettyFormatCharacters,
 	}
 }
 
 // NewOptions creates option's instance using [OptionCallback]
 func NewOptions(ocbs ...OptionCallback) *Options {
 	options := &Options{
-		Sampling:     2,
-		SampleSize:   10,
-		MaxRows:      -1,
-		Separator:    ',',
-		IgnoreHeader: false,
-		Definitions:  make(map[string]*Definition, 0),
+		Name:            "",
+		SampleSize:      5,
+		SampleMaxLength: 15,
+		MaxRows:         -1,
+		Separator:       ',',
+		IgnoreHeader:    false,
+		Definitions:     make(map[string]*Definition, 0),
+		EmptyText:       "<empty>",
+		PrettyFormatCharacters: []rune{
+			'┌', // table head start
+			'┬', // table head col separator
+			'┐', // table head end
+			'│', // row start and end
+			'┆', // column separator
+			'╞', // table body section start
+			'╪', // table body section col separator
+			'═', // table body section repeater
+			'╡', // table body section end
+			'└', // table foot start
+			'┴', // table foot col separator
+			'┘', // table foot end
+			'─', // column filler repeater
+			'-', // column type separator repeater
+			' ', // space around content
+		},
 	}
 
 	for _, cb := range ocbs {
@@ -67,6 +98,18 @@ func NewOptions(ocbs ...OptionCallback) *Options {
 	}
 
 	return options
+}
+
+func WithName(name string) OptionCallback {
+	return func(o *Options) {
+		o.Name = name
+	}
+}
+
+func WithEmptyText(et string) OptionCallback {
+	return func(o *Options) {
+		o.EmptyText = et
+	}
 }
 
 func WithIgnoreHeader(ih bool) OptionCallback {
@@ -81,15 +124,15 @@ func WithMaxRows(s int) OptionCallback {
 	}
 }
 
-func WithSampling(s int) OptionCallback {
-	return func(o *Options) {
-		o.Sampling = s
-	}
-}
-
 func WithSampleSize(s int) OptionCallback {
 	return func(o *Options) {
 		o.SampleSize = s
+	}
+}
+
+func WithSampleMaxLength(s int) OptionCallback {
+	return func(o *Options) {
+		o.SampleMaxLength = s
 	}
 }
 
@@ -120,5 +163,13 @@ func WithDefinition(name string, def *Definition) OptionCallback {
 func WithDefinitionType(name string, tp reflect.Type) OptionCallback {
 	return func(o *Options) {
 		o.Definitions[name] = NewDefinition(tp)
+	}
+}
+
+func WithPrettyFormatCharacters(chars []rune) OptionCallback {
+	return func(o *Options) {
+		if len(chars) >= 15 {
+			o.PrettyFormatCharacters = chars
+		}
 	}
 }

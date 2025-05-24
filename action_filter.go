@@ -14,7 +14,7 @@ func (a ActionFilterRow) Execute(src *Table) (*Table, error) {
 	}
 
 	idx := 0
-	var filtered = make([]*Row, 0)
+	filtered := make([]*Row, 0)
 	for _, row := range src.Rows {
 		if a.callback(src.State, row) {
 			filtered = append(filtered, row.Clone().WithIndex(idx))

@@ -4,10 +4,10 @@ import (
 	"reflect"
 )
 
-type AddColumnDataReader[T any] = func(*State, *Row) T
+type AddColumnDataReader[T any] = func(*State, *Row) (T, error)
 
 type ActionAddColumn[T any] struct {
-	name     string
+	column   string
 	dataType reflect.Type
 	callback AddColumnDataReader[T]
 }
@@ -20,12 +20,17 @@ func (a ActionAddColumn[T]) Execute(src *Table) (*Table, error) {
 	df := src.CloneE()
 	pos := src.ColLength()
 
-	df.ResolveDefinition(a.name, a.dataType)
-	df.AppendColumn(pos, a.name)
+	df.ResolveDefinition(a.column, a.dataType)
+	df.AppendColumn(pos, a.column)
 
 	for _, r := range src.Rows {
 		row := r.Clone()
-		df.AddRow(row.AddColumn(a.callback(df.State, row)))
+		v, err := a.callback(df.State, row)
+		if err != nil {
+			return nil, err
+		}
+
+		df.AddRow(row.AddColumn(v))
 	}
 
 	return df, nil
@@ -35,18 +40,18 @@ func (a ActionAddColumn[T]) Execute(src *Table) (*Table, error) {
 // column value using callback and generates new table.
 // Generic type of [T any] is applied.
 //
-//	$0 : Column Name
-//	$1 : Sample Value of T
-//	$2 : func(*framed.State, *framed.Row) T
+//	$0 : Column Name (string)
+//	$1 : Sample Value (T)
+//	$2 : func(*framed.State, *framed.Row) (T, error)
 //
 //	newTable, err := table.Execute(
 //		...
 //		framed.AddColumn($0, $1, $2),
 //		...
 //	)
-func AddColumn[T any](name string, sample T, cb AddColumnDataReader[T]) *ActionAddColumn[T] {
+func AddColumn[T any](column string, sample T, cb AddColumnDataReader[T]) *ActionAddColumn[T] {
 	return &ActionAddColumn[T]{
-		name:     name,
+		column:   column,
 		dataType: ToType(sample),
 		callback: cb,
 	}

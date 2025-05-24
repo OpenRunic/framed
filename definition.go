@@ -6,10 +6,10 @@ import (
 
 // Definition defines details and encoder/decoder for values
 type Definition struct {
-	Label   string
-	Type    reflect.Type
-	Encoder func(any) (string, error)
-	Decoder func(string) (any, error)
+	Type         reflect.Type
+	EmptyChecker func(any) bool
+	Encoder      func(any) (string, error)
+	Decoder      func(string) (any, error)
 }
 
 // Kind returns the reflect.Kind from stored reflect.Type
@@ -17,21 +17,37 @@ func (d *Definition) Kind() reflect.Kind {
 	return d.Type.Kind()
 }
 
-// WithLabel changes the label for current definition
-func (d *Definition) WithLabel(val string) *Definition {
-	d.Label = val
+// Copy copies extra details of definition if type matches
+func (d *Definition) Copy(rd *Definition) *Definition {
+	if rd != nil && d.Type == rd.Type {
+		if rd.Encoder != nil {
+			d.UseEncoder(rd.Encoder)
+		}
+		if rd.Decoder != nil {
+			d.UseDecoder(rd.Decoder)
+		}
+		if rd.EmptyChecker != nil {
+			d.UseEmptyChecker(rd.EmptyChecker)
+		}
+	}
 	return d
 }
 
-// WithEncoder updates the encoder to use for data
-func (d *Definition) WithEncoder(cb func(any) (string, error)) *Definition {
+// UseEncoder updates the encoder to use for data
+func (d *Definition) UseEncoder(cb func(any) (string, error)) *Definition {
 	d.Encoder = cb
 	return d
 }
 
-// WithEncoder updates the decoder to use for data
-func (d *Definition) WithDecoder(cb func(string) (any, error)) *Definition {
+// UseDecoder updates the decoder to use for data
+func (d *Definition) UseDecoder(cb func(string) (any, error)) *Definition {
 	d.Decoder = cb
+	return d
+}
+
+// UseEncoder updates the encoder to use for data
+func (d *Definition) UseEmptyChecker(cb func(any) bool) *Definition {
+	d.EmptyChecker = cb
 	return d
 }
 

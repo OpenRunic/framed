@@ -55,19 +55,29 @@ func (t *Table) AsColumn(idx int, value string) (any, error) {
 	def := t.State.Definition(t.State.ColumnName(idx))
 	val, err := ColumnValueDecoder(def, value)
 	if err != nil {
-		return nil, ColError(t.Length()-1, idx, t.State.ColumnName(idx), err, "value_decode")
+		return nil, DecodeColumnValueError(t.Length()-1, idx, err)
 	}
 	return val, nil
 }
 
-func (t *Table) AddRow(rows ...*Row) {
-	t.Rows = append(t.Rows, rows...)
+// AddRow inserts new row to table
+func (t *Table) AddRow(row *Row) *Table {
+	t.Rows = append(t.Rows, row)
+	return t
+}
+
+// AddRow inserts multiple rows to table
+func (t *Table) AddRows(rows []*Row) *Table {
+	for _, row := range rows {
+		t.Rows = append(t.Rows, row)
+	}
+	return t
 }
 
 // AppendColumn adds new column to table
-func (t *Table) AppendColumn(pos int, name string) {
-	t.State.Indexes[name] = pos
-	t.State.Columns = append(t.State.Columns, name)
+func (t *Table) AppendColumn(pos int, column string) {
+	t.State.Indexes[column] = pos
+	t.State.Columns = append(t.State.Columns, column)
 }
 
 // Insert adds line of bytes as row

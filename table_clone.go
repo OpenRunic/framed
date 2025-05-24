@@ -26,12 +26,7 @@ func CherryPick(src *Table, columns []string, rows []*Row) (*Table, error) {
 		df.UseColumns(SlicePick(src.State.Columns, columns))
 
 		for _, fRow := range rows {
-			nRow, err := fRow.CloneP(src.State, columns...)
-			if err != nil {
-				return nil, err
-			}
-
-			df.AddRow(nRow)
+			df.AddRow(fRow.CloneP(src.State.ResolveIndexes(columns)))
 		}
 	}
 

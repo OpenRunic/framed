@@ -1,7 +1,6 @@
 package framed
 
 import (
-	"fmt"
 	"reflect"
 	"slices"
 )
@@ -45,26 +44,32 @@ func (t *Table) SetIndexes(cache IndexCache) {
 }
 
 // SetDefinition assigns [Definition] for the column
-func (t *Table) SetDefinition(name string, def *Definition) *Definition {
-	t.State.Definitions[name] = def
+func (t *Table) SetDefinition(column string, def *Definition) *Definition {
+	t.State.Definitions[column] = def
 	return def
 }
 
+// SetDefinitions overrides all the saved definitions
+func (t *Table) SetDefinitions(defs map[string]*Definition) *Table {
+	t.State.Definitions = defs
+	return t
+}
+
 // ResolveDefinition stores the column [Definition] if it doesn't exist
-func (t *Table) ResolveDefinition(name string, tp reflect.Type) *Definition {
-	def := t.State.Definition(name)
+func (t *Table) ResolveDefinition(column string, tp reflect.Type) *Definition {
+	def := t.State.Definition(column)
 	if def != nil {
 		return def
 	}
 
-	t.State.Definitions[name] = NewDefinition(tp)
+	t.State.Definitions[column] = NewDefinition(tp)
 
-	return t.State.Definition(name)
+	return t.State.Definition(column)
 }
 
 // ResolveValueDefinition detects data type of column value and creates [Definition]
-func (t *Table) ResolveValueDefinition(idx int, name string, value string) *Definition {
-	def := t.State.Definition(name)
+func (t *Table) ResolveValueDefinition(idx int, column string, value string) *Definition {
+	def := t.State.Definition(column)
 	if def != nil {
 		return def
 	}
@@ -80,25 +85,25 @@ func (t *Table) ResolveValueDefinition(idx int, name string, value string) *Defi
 	}
 
 	if dContinue {
-		tp = DetectValueType(name, value)
+		tp = DetectValueType(column, value)
 	}
 
-	t.State.Definitions[name] = NewDefinition(tp)
+	t.State.Definitions[column] = NewDefinition(tp)
 
-	return t.State.Definition(name)
+	return t.State.Definition(column)
 }
 
 // ResolveTypes resolves the data types from the column values
-func (t *Table) ResolveTypes(names []string, values []string) error {
+func (t *Table) ResolveTypes(columns []string, values []string) error {
 	if !t.resolved {
-		t.resolved = true
+		t.MarkResolved()
 
-		if len(names) != len(values) {
-			return fmt.Errorf("invalid size of column names and values; %d != %d", len(names), len(values))
+		if len(columns) != len(values) {
+			return InvalidTableShapeError(len(columns), len(values))
 		}
 
 		for idx, value := range values {
-			t.ResolveValueDefinition(idx, names[idx], value)
+			t.ResolveValueDefinition(idx, columns[idx], value)
 		}
 	}
 
@@ -114,6 +119,12 @@ func (t *Table) UseColumns(values []string) {
 
 	t.SetColumns(slices.Clone(values))
 	t.SetIndexes(cache)
+}
+
+// MarkResolved marks table as resolved
+func (t *Table) MarkResolved() *Table {
+	t.resolved = true
+	return t
 }
 
 // MarkUnresolved marks table as unresolved

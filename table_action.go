@@ -1,16 +1,5 @@
 package framed
 
-// PipelineAction defines an action interface to modify
-// table rows and options as needed.
-type PipelineAction interface {
-
-	// ActionName returns the name of pipeline action
-	ActionName() string
-
-	// Execute executes the pipeline action
-	Execute(*Table) (*Table, error)
-}
-
 // Execute is called by [Table] when pipeline actions are executed
 func (t *Table) Execute(actions ...PipelineAction) (*Table, error) {
 	df := t
@@ -35,6 +24,17 @@ func (t *Table) ExecuteS(actions ...PipelineAction) error {
 	}
 
 	*t = *df
+
+	return nil
+}
+
+// Invalidate runs row validate using callback
+func (t *Table) Invalidate(cb func(*Row) error) error {
+	for _, row := range t.Rows {
+		if err := cb(row); err != nil {
+			return RowValidationFailedError(row.Index, err)
+		}
+	}
 
 	return nil
 }

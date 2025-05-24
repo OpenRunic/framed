@@ -15,13 +15,9 @@ func TestTableRowPutValue(t *testing.T) {
 	if err == nil {
 		t.Error("expected error on invalid value set, got none")
 	} else {
-		r, err := row.CloneP(df.State, "age")
-		if err != nil {
-			t.Error(err)
-		} else {
-			if reflect.TypeOf(r.At(0)).Kind() != reflect.Int64 {
-				t.Error("failed to clone and pick column from existing row")
-			}
+		r := row.CloneP([]int{df.State.Index("age")})
+		if reflect.TypeOf(r.At(0)).Kind() != reflect.Int64 {
+			t.Error("failed to clone and pick column from existing row")
 		}
 	}
 }

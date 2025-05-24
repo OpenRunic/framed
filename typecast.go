@@ -17,8 +17,15 @@ var BoolToStringValues = []string{"1", "false", "no", "n"}
 // value that can be auto-translated to true boolean
 var BoolTrueStringValues = []string{"1", "true", "yes", "y"}
 
+// NumericKinds contains slice of [reflect.Kind]
+// that can run arthematic operations
+var NumericKinds = []reflect.Kind{
+	reflect.Int, reflect.Int32, reflect.Int64,
+	reflect.Float32, reflect.Float64,
+}
+
 // StringTranslatableKinds contains slice of [reflect.Kind]
-// that can be translated to string
+// that can be translated to string by default
 var StringTranslatableKinds = []reflect.Kind{
 	reflect.String,
 	reflect.Int, reflect.Int32, reflect.Int64,
@@ -33,10 +40,23 @@ func init() {
 // ToType reads the [reflect.Type] from provided value
 func ToType[T any](v T) reflect.Type {
 	tp := reflect.TypeOf(v)
+	if tp == nil {
+		return nil
+	}
+
 	if tp.Kind() == reflect.Slice {
 		return tp.Elem()
 	}
 	return tp
+}
+
+// ParseInt converts string to int as base10 with variable bit size
+func ParseInt(s string, bitSize int) (int64, error) {
+	val, err := strconv.ParseInt(s, 10, bitSize)
+	if err != nil {
+		return 0, err
+	}
+	return val, nil
 }
 
 // DetectValueType detects and returns [reflect.Type] of string value
@@ -68,15 +88,6 @@ func DetectValueType(name string, value string) reflect.Type {
 	}
 
 	return ToType("")
-}
-
-// ParseInt converts string to int as base10 with variable bit size
-func ParseInt(s string, bitSize int) (int64, error) {
-	val, err := strconv.ParseInt(s, 10, bitSize)
-	if err != nil {
-		return 0, err
-	}
-	return val, nil
 }
 
 // ConvertValueType converts string to provided type or throws error
@@ -141,6 +152,11 @@ func ColumnValueEncoder(def *Definition, value any) (string, error) {
 
 	if def.Kind() == reflect.String || slices.Contains(StringTranslatableKinds, def.Kind()) {
 		return fmt.Sprintf("%v", value), nil
+	} else {
+		ss, ok := value.(fmt.Stringer)
+		if ok {
+			return ss.String(), nil
+		}
 	}
 
 	return "", fmt.Errorf("failed to encode %s value to string", def.Type)

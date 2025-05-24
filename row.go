@@ -1,7 +1,6 @@
 package framed
 
 import (
-	"fmt"
 	"slices"
 )
 
@@ -27,31 +26,44 @@ func (r *Row) AddColumn(value any) *Row {
 	return r
 }
 
-// At gives access to column at x index
-func (r *Row) At(idx int) any {
-	return r.Columns[idx]
+// At gives access to column at n index
+func (r *Row) At(n int) any {
+	if n > -1 {
+		return r.Columns[n]
+	}
+	return nil
 }
 
-// Set updates column value at x index
-func (r *Row) Set(idx int, value any) *Row {
-	r.Columns[idx] = value
+// Set updates column value at n index
+func (r *Row) Set(n int, value any) *Row {
+	r.Columns[n] = value
 	return r
 }
 
-// Patch attempts to update column value at x index
+// Patch attempts to update column value at n index
 // and throws error on type fail
-func (r *Row) Patch(def *Definition, idx int, value any) error {
+func (r *Row) Patch(def *Definition, n int, value any) error {
 	tp := ToType(value)
 	if def.Type != tp {
-		return ColError(
-			r.Index, idx, "",
-			fmt.Errorf("set column value failed; %s != %s", def.Type, tp),
-			"write_value",
-		)
+		return WriteColumnValueError(r.Index, n, def.Type, tp)
 	}
 
-	r.Set(idx, value)
+	r.Set(n, value)
 	return nil
+}
+
+// Encode attempts to encode column value to string
+func (r *Row) Encode(def *Definition, n int) (string, error) {
+	colVal := r.At(n)
+	if IsEmpty(def, colVal) {
+		return "", nil
+	}
+
+	val, err := ColumnValueEncoder(def, colVal)
+	if err != nil {
+		return "", EncodeColumnValueError(r.Index, n, err)
+	}
+	return val, nil
 }
 
 // AsSlice encodes columns to slice of strings or throws error
@@ -60,9 +72,9 @@ func (r *Row) AsSlice(s *State) ([]string, error) {
 	values := make([]string, colCount)
 
 	for i := range colCount {
-		val, err := ColumnValueEncoder(s.DefinitionAt(i), r.At(i))
+		val, err := r.Encode(s.DefinitionAt(i), i)
 		if err != nil {
-			return nil, ColError(r.Index, i, s.ColumnName(i), err, "value_encode")
+			return nil, err
 		}
 		values[i] = val
 	}
@@ -70,38 +82,30 @@ func (r *Row) AsSlice(s *State) ([]string, error) {
 	return values, nil
 }
 
-// Pick selects provided columns from the row or throws error
-func (r *Row) Pick(s *State, names ...string) ([]any, error) {
-	cols := slices.Clone(names)
-	if len(cols) < 1 {
-		cols = slices.Clone(s.Columns)
+// Copy copies from value slice to their index
+func (r *Row) Copy(v []any) *Row {
+	cap := len(r.Columns)
+	for i, v := range v {
+		if cap > i {
+			r.Columns[i] = v
+		}
 	}
+	return r
+}
 
+// Pick selects provided columns from the row or throws error
+func (r *Row) Pick(indexes []int) []any {
 	columns := make([]any, 0)
 
-	for _, col := range cols {
-		idx := s.Index(col)
+	for _, idx := range indexes {
 		if idx > -1 {
 			columns = append(columns, r.At(idx))
 		} else {
-			return nil, RowError(r.Index, fmt.Errorf("unknown column [%s]", col), "not_found")
+			columns = append(columns, nil)
 		}
 	}
 
-	return columns, nil
-}
-
-// CloneP create duplicate row from selected columns
-func (r *Row) CloneP(s *State, names ...string) (*Row, error) {
-	columns, err := r.Pick(s, names...)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Row{
-		Index:   r.Index,
-		Columns: columns,
-	}, nil
+	return columns
 }
 
 // Clone duplicates the row as-is
@@ -109,5 +113,21 @@ func (r *Row) Clone() *Row {
 	return &Row{
 		Index:   r.Index,
 		Columns: slices.Clone(r.Columns),
+	}
+}
+
+// CloneP create duplicate row from selected columns
+func (r *Row) CloneP(indexes []int) *Row {
+	return &Row{
+		Index:   r.Index,
+		Columns: r.Pick(indexes),
+	}
+}
+
+// NewRow creates a row with defined length
+func NewRow(idx int, size int) *Row {
+	return &Row{
+		Index:   idx,
+		Columns: make([]any, size),
 	}
 }

@@ -23,7 +23,7 @@ jobs:
           version: v2.0
 
       - name: Run Lints
-        run: make lint
+        run: golangci-lint run -c .golangci.yaml ./...
 
       - name: Run Test
-        run: make test
+        run: go test -v ./... -test.timeout 5s

@@ -10,8 +10,8 @@ import (
 func TestActionAddColumn(t *testing.T) {
 	df := SampleTestTable()
 	newDF, err := df.Execute(
-		framed.AddColumn("name", "", func(s *framed.State, r *framed.Row) string {
-			return fmt.Sprintf("%s %s", r.At(s.Index("last_name")), r.At(s.Index("first_name")))
+		framed.AddColumn("name", "", func(s *framed.State, r *framed.Row) (string, error) {
+			return fmt.Sprintf("%s %s", r.At(s.Index("last_name")), r.At(s.Index("first_name"))), nil
 		}),
 	)
 

@@ -4,10 +4,10 @@ import (
 	"reflect"
 )
 
-type ChangeColumnDataReader[T any] = func(*State, *Row, any) T
+type ChangeColumnDataReader[T any] = func(*State, *Row, any) (T, error)
 
 type ActionChangeColumnType[T any] struct {
-	name     string
+	column   string
 	dataType reflect.Type
 	callback ChangeColumnDataReader[T]
 }
@@ -18,16 +18,21 @@ func (a ActionChangeColumnType[T]) ActionName() string {
 
 func (a ActionChangeColumnType[T]) Execute(src *Table) (*Table, error) {
 	df := src.CloneE()
-	colIndex := df.State.Index(a.name)
+	colIndex := df.State.Index(a.column)
 
-	typeChanged := a.dataType != df.State.DataType(a.name)
+	typeChanged := a.dataType != df.State.DataType(a.column)
 	if typeChanged {
-		df.SetDefinition(a.name, NewDefinition(a.dataType))
+		df.SetDefinition(a.column, NewDefinition(a.dataType))
 	}
 
 	for _, r := range src.Rows {
 		row := r.Clone()
-		df.AddRow(row.Set(colIndex, a.callback(df.State, row, row.At(colIndex))))
+		val, err := a.callback(df.State, row, row.At(colIndex))
+		if err != nil {
+			return nil, err
+		}
+
+		df.AddRow(row.Set(colIndex, val))
 	}
 
 	return df, nil
@@ -37,18 +42,18 @@ func (a ActionChangeColumnType[T]) Execute(src *Table) (*Table, error) {
 // column value using callback and generates new table.
 // Generic type of [T any] is applied.
 //
-//	$0 : Column Name
-//	$1 : Sample Value of T
-//	$2 : func(*framed.State, *framed.Row, any) T
+//	$0 : Column Name (string)
+//	$1 : Sample Value (T)
+//	$2 : func(*framed.State, *framed.Row, any) (T, error)
 //
 //	newTable, err := table.Execute(
 //		...
 //		framed.ChangeColumnType($0, $1, $2),
 //		...
 //	)
-func ChangeColumnType[T any](name string, sample T, cb ChangeColumnDataReader[T]) *ActionChangeColumnType[T] {
+func ChangeColumnType[T any](column string, sample T, cb ChangeColumnDataReader[T]) *ActionChangeColumnType[T] {
 	return &ActionChangeColumnType[T]{
-		name:     name,
+		column:   column,
 		dataType: ToType(sample),
 		callback: cb,
 	}

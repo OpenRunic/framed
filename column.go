@@ -71,6 +71,9 @@ func TryColumnValue[T any](row *Row, idx int) (T, error) {
 	isPtr := false
 	val := row.At(idx)
 	tp := reflect.TypeOf(val)
+	if tp == nil {
+		return any("").(T), ColumnReadValueNilError(row.Index, idx)
+	}
 	if tp.Kind() == reflect.Ptr {
 		isPtr = true
 	}
@@ -81,12 +84,7 @@ func TryColumnValue[T any](row *Row, idx int) (T, error) {
 	}
 
 	if tp != sample {
-		var v any = ""
-		return v.(T), ColError(
-			row.Index, idx, "",
-			fmt.Errorf("get column value failed; %s != %s", tp, sample),
-			"read_value",
-		)
+		return any("").(T), ColumnReadValueError(row.Index, idx, tp, sample)
 	}
 
 	return val.(T), nil

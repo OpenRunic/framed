@@ -23,10 +23,10 @@ df := framed.New(
   framed.WithSeparator(';'),
 
   // set column names for table (otherwise automatically generated from first row)
-  framed.WithColumns([]string{"id", "col2", ... "colN"}),
+  framed.WithColumns([]string{"col1", "col2", ... "colN"}),
 
   // set column definition
-  framed.WithDefinitionType("id", framed.ToType(1)),
+  framed.WithDefinitionType("col1", framed.ToType(1)),
 
   // set column data type reader
   framed.WithTypeReader(func(idx int, value string) reflect.Type {
@@ -62,37 +62,20 @@ Run set of pipeline actions to modify data in the table
 
 ```go
 // add column action
-addAction := framed.AddColumn("name", "", func(s *framed.State, r *framed.Row) string {
-  return fmt.Sprintf("%s %s", r.At(s.Index("last_name")), r.At(s.Index("first_name")))
-})
-
-// drop column action
-dropAction := framed.DropColumn("last_name", "age")
-
-// rename column action
-renameAction := framed.RenameColumn("fname", "first_name")
-
-// pick specific columns action
-pickAction := framed.PickColumn("first_name", "last_name")
-
-// omit specific columns action
-omitAction := framed.PickColumn("id", "age")
-
-// make specific changes to table or its options while in pipeline action
-updateAction := framed.ChangeOptions(func(tbl *Table) (*Table, error) {
-  return tbl, nil
+addAction := framed.AddColumn("name", "", func(s *framed.State, r *framed.Row) (string, error) {
+  return fmt.Sprintf("%s %s", r.At(s.Index("last_name")), r.At(s.Index("first_name"))), nil
 })
 
 // change column type action
-changeColTypeAction := framed.ChangeColumnType("age", "", func(s *framed.State, r *framed.Row, a any) string {
+changeColTypeAction := framed.ChangeColumnType("age", "", func(s *framed.State, r *framed.Row, a any) (string, error) {
   v := a.(int64)
   if v > 18 {
-    return "adult"
+    return "adult", nil
   } else if v > 12 {
-    return "teen"
+    return "teen", nil
   }
 
-  return "kid"
+  return "kid", nil
 })
 
 // modify every table rows action
@@ -106,17 +89,30 @@ filterAction := framed.FilterRow(func(s *framed.State, r *framed.Row) bool {
   return r.Index > 9 // ignore first 10 rows
 })
 
+// pick specific columns action
+pickAction := framed.PickColumn("first_name", "last_name")
+
+// drop column action
+dropAction := framed.DropColumn("last_name", "age")
+
+// rename column action
+renameAction := framed.RenameColumn("fname", "first_name")
+
+// make specific changes to table or its options while in pipeline action
+updateAction := framed.UpdateTable(func(tbl *Table) (*Table, error) {
+  return tbl, nil
+})
+
 // execute actions to build new table from result
 newTable, err := table.Execute(
   addAction,
-  dropAction,
-  renameAction,
-  pickAction,
-  omitAction,
-  updateAction,
   changeColTypeAction,
   modifyAction,
   filterAction,
+  pickAction,
+  dropAction,
+  renameAction,
+  updateAction,
 )
 ```
 
@@ -165,17 +161,17 @@ table.Last()
 // get length of rows
 table.Length()
 
-// get row at x index
-row := table.At(x)
+// get row at n index
+row := table.At(n)
 
-// get column at x index of row
-colValue := row.At(0)
+// get column at n index of row
+colValue := row.At(n)
 
-// set column value at x index of row
-row.Set(0, "updated_value")
+// set column value at n index of row
+row.Set(n, "updated_value")
 
-// patch column value at x index of row with type-safety
-err := row.Patch(0, "updated_value")
+// patch column value at n index of row with type-safety
+err := row.Patch(n, "updated_value")
 
 // pick only selected columns from row
 columns, err := row.Pick("col2", "col3")
@@ -189,10 +185,10 @@ newRow, err := row.CloneP("col2", "col3")
 
 ```go
 // extract reflect.Type from any given value
-framed.ToType(10)
+typ := framed.ToType(10)
 
-// read typesafe column value from column as index 0
-value := framed.ColumnValue[string](row, 0, "default_value")
+// read typesafe column value from row at n index
+value := framed.ColumnValue[string](row, n, "default_value")
 ```
 
 ### Support

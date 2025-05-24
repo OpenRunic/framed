@@ -9,15 +9,15 @@ import (
 func TestActionChangeColumnType(t *testing.T) {
 	df := SampleTestTable()
 	newDF, err := df.Execute(
-		framed.ChangeColumnType("age", "", func(_ *framed.State, _ *framed.Row, a any) string {
+		framed.ChangeColumnType("age", "", func(_ *framed.State, _ *framed.Row, a any) (string, error) {
 			v := a.(int64)
 			if v > 18 {
-				return "adult"
+				return "adult", nil
 			} else if v > 12 {
-				return "teen"
+				return "teen", nil
 			}
 
-			return "kid"
+			return "kid", nil
 		}),
 	)
 

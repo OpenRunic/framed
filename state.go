@@ -28,17 +28,26 @@ func (s *State) IsEmpty() bool {
 }
 
 // Index retrieves the index of column
-func (s *State) Index(name string) int {
-	idx, ok := s.Indexes[name]
+func (s *State) Index(column string) int {
+	idx, ok := s.Indexes[column]
 	if ok {
 		return idx
 	}
 	return -1
 }
 
+// ResolveIndexes retrieves the indexes of columns
+func (s *State) ResolveIndexes(columns []string) []int {
+	res := make([]int, len(columns))
+	for i, col := range columns {
+		res[i] = s.Indexes[col]
+	}
+	return res
+}
+
 // HasColumn checks if column is available
-func (s *State) HasColumn(name string) bool {
-	return s.Index(name) > -1
+func (s *State) HasColumn(column string) bool {
+	return s.Index(column) > -1
 }
 
 // ColumnName retrieves the name of column from index
@@ -51,14 +60,14 @@ func (s *State) ColumnName(idx int) string {
 }
 
 // HasDefinition checks if definition is available
-func (s *State) HasDefinition(name string) bool {
-	_, ok := s.Definitions[name]
+func (s *State) HasDefinition(column string) bool {
+	_, ok := s.Definitions[column]
 	return ok
 }
 
 // Definition retrieves the value definition
-func (s *State) Definition(name string) *Definition {
-	return s.Definitions[name]
+func (s *State) Definition(column string) *Definition {
+	return s.Definitions[column]
 }
 
 // DefinitionAt retrieves the value definition via index
@@ -78,8 +87,8 @@ func (s *State) DataTypes() map[string]reflect.Type {
 }
 
 // DataType returns data type for single value
-func (s *State) DataType(name string) reflect.Type {
-	def := s.Definition(name)
+func (s *State) DataType(column string) reflect.Type {
+	def := s.Definition(column)
 	if def != nil {
 		return def.Type
 	}

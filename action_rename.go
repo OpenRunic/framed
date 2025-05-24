@@ -1,7 +1,5 @@
 package framed
 
-import "fmt"
-
 type ActionRenameColumn struct {
 	pairs [][]string
 }
@@ -23,7 +21,7 @@ func (a ActionRenameColumn) Execute(src *Table) (*Table, error) {
 			delete(df.State.Indexes, pair[0])
 			delete(df.State.Definitions, pair[0])
 		} else {
-			return nil, fmt.Errorf("unable to locate column: %s", pair[0])
+			return nil, UnknownColumnError(pair[0])
 		}
 	}
 
@@ -32,18 +30,18 @@ func (a ActionRenameColumn) Execute(src *Table) (*Table, error) {
 
 // RenameColumn renames a column generates the new table.
 //
-//	$0 : Existing Column Name
-//	$1 : New Column Name
+//	$0 : Existing Column Name (string)
+//	$1 : New Column Name (string)
 //
 //	newTable, err := table.Execute(
 //		...
 //		framed.RenameColumn($0, $1),
 //		...
 //	)
-func RenameColumn(name string, newName string) *ActionRenameColumn {
+func RenameColumn(column string, newColumn string) *ActionRenameColumn {
 	return &ActionRenameColumn{
 		pairs: [][]string{
-			{name, newName},
+			{column, newColumn},
 		},
 	}
 }
